@@ -678,18 +678,24 @@
             <h2 style="margin-bottom: 0.5rem;">Coordinator Login</h2>
             <p style="color: var(--text-secondary); margin-bottom: 2rem;">Please enter your credentials to continue.</p>
             <div style="text-align: left; margin-bottom: 1rem;">
-                <label style="display: block; font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Username</label>
-                <input type="text" id="loginUsername" class="form-control" placeholder="Enter username" style="width: 100%;" onkeypress="if(event.key === 'Enter') checkLogin()">
+                <label
+                    style="display: block; font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Username</label>
+                <input type="text" id="loginUsername" class="form-control" placeholder="Enter username"
+                    style="width: 100%;" onkeypress="if(event.key === 'Enter') checkLogin()">
             </div>
             <div style="text-align: left; margin-bottom: 1.5rem;">
-                <label style="display: block; font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Password</label>
-                <input type="password" id="loginPassword" class="form-control" placeholder="Enter password" style="width: 100%;" onkeypress="if(event.key === 'Enter') checkLogin()">
+                <label
+                    style="display: block; font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Password</label>
+                <input type="password" id="loginPassword" class="form-control" placeholder="Enter password"
+                    style="width: 100%;" onkeypress="if(event.key === 'Enter') checkLogin()">
             </div>
-            <div id="loginError" style="color: var(--danger); font-size: 0.875rem; margin-bottom: 1rem; display: none;">Invalid username or password.</div>
-            <button class="btn btn-primary" style="width: 100%; padding: 0.75rem; font-size: 1rem;" onclick="checkLogin()">Login</button>
+            <div id="loginError" style="color: var(--danger); font-size: 0.875rem; margin-bottom: 1rem; display: none;">
+                Invalid username or password.</div>
+            <button class="btn btn-primary" style="width: 100%; padding: 0.75rem; font-size: 1rem;"
+                onclick="checkLogin()">Login</button>
         </div>
     </div>
-    
+
     <script>
         function checkLogin() {
             const user = document.getElementById('loginUsername').value;
@@ -973,16 +979,13 @@
         let app, db;
         try {
             app = initializeApp(firebaseConfig);
-            // Only force long-polling if opened locally via file:/// to bypass strict Chrome CORS.
-            // When hosted on a real domain (https://), use standard WebSockets which won't trigger the wildcard CORS error.
-            if (window.location.protocol === 'file:') {
-                db = initializeFirestore(app, {
-                    experimentalForceLongPolling: true
-                });
-            } else {
-                db = getFirestore(app);
-            }
-        } catch (e) { console.error(e); }
+            // Completely disable long-polling fallbacks to fix CORS and 400 errors on GitHub Pages
+            db = initializeFirestore(app, {
+                experimentalAutoDetectLongPolling: false
+            });
+        } catch (e) {
+            console.error("Firebase Initialization Error:", e);
+        }
 
         let currentBatchId = 'all';
         let allEntries = [];
