@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coordinator Dashboard | Kriya Sharir Dept.</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons & Libs -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        :root {
+            --bg-primary: #F8FAFC;
+            --text-primary: #1E293B;
+            --text-secondary: #475569;
+            --primary: #2563EB;
+            --primary-hover: #1D4ED8;
+            --danger: #EF4444;
+            --danger-hover: #DC2626;
+            --warning: #F59E0B;
+            --success: #10B981;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --border-light: #E2E8F0;
+        }
+
+        .dark-theme {
+            --bg-primary: #0F172A;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            --border-light: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            height: 4rem;
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-box {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #E2E8F0;
+        }
+
+        .logo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .app-title {
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        .badge {
+            background-color: #FEF3C7;
+            color: #92400E;
+            border: 1px solid #FDE68A;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Forms & Inputs */
+        input,
+        select {
+            font-family: inherit;
+            background: var(--glass-bg);
+            border: 1px solid var(--border-light);
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex-grow: 1;
+            max-width: 400px;
+        }
+
+        .search-wrapper input {
+            width: 100%;
+            padding-left: 2.5rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            width: 1rem;
+            height: 1rem;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #D97706;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--danger-hover);
+        }
+
+        .btn-ghost {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-light);
+        }
+
+        .btn-ghost:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--text-primary);
+        }
+
+        .dark-theme .btn-ghost:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .icon-btn {
+            padding: 0.5rem;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--text-primary);
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            border-radius: 1rem;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            animation: modalIn 0.3s ease-out;
+        }
+
+        #batchModal .modal-content {
+            max-width: 650px;
+        }
+
+        #importModal .modal-content {
+            max-width: 600px;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .dark-theme .modal-footer {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-control {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Import Mode Selection */
+        .import-mode-card {
+            border: 2px solid var(--border-light);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .import-mode-card:hover {
+            border-color: var(--primary);
+        }
+
+        .import-mode-card.selected {
+            border-color: var(--primary);
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .import-mode-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .import-mode-card p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .mode-safe {
+            border-left: 4px solid var(--success);
+        }
+
+        .mode-safe.selected {
+            background-color: rgba(16, 185, 129, 0.05);
+        }
+
+        .mode-danger {
+            border-left: 4px solid var(--danger);
+        }
+
+        .mode-danger.selected {
+            background-color: rgba(239, 68, 68, 0.05);
+        }
+
+        .mode-update {
+            border-left: 4px solid var(--warning);
+        }
+
+        .mode-update.selected {
+            background-color: rgba(245, 158, 11, 0.05);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-top: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* Dashboard specific */
+        main {
+            padding-top: 2rem;
+            padding-bottom: 4rem;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            background: var(--glass-bg);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--glass-shadow);
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--glass-shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background-color: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Table Area */
+        .table-container {
+            background: var(--glass-bg);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--glass-shadow);
+            overflow: auto;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            min-width: 600px;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: rgba(0, 0, 0, 0.02);
+            padding: 1rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-light);
+            user-select: none;
+        }
+
+        th.sortable {
+            cursor: pointer;
+        }
+
+        th.sortable:hover {
+            color: var(--primary);
+        }
+
+        th .icon-sort {
+            display: inline-block;
+            width: 0.875rem;
+            height: 0.875rem;
+            vertical-align: middle;
+            margin-left: 0.25rem;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 0.875rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: rgba(0, 0, 0, 0.01);
+        }
+
+        .dark-theme tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .empty-state {
+            padding: 4rem 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            display: none;
+        }
+
+        .empty-state.active {
+            display: block;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-light);
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            min-width: 160px;
+            padding: 0.5rem 0;
+            display: none;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .dark-theme .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .hide-mobile {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-wrapper {
+                max-width: 100%;
+            }
+
+            .hide-mobile {
+                display: none;
+            }
+        }
+
+        /* Login Overlay */
+        #loginOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-primary);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s;
+        }
+
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--glass-shadow);
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Login Overlay -->
+    <div id="loginOverlay">
+        <div class="login-card">
+            <h2 style="margin-bottom: 0.5rem;">Coordinator Login</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Please enter your credentials to continue.</p>
+            <div style="text-align: left; margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Username</label>
+                <input type="text" id="loginUsername" class="form-control" placeholder="Enter username" style="width: 100%;" onkeypress="if(event.key === 'Enter') checkLogin()">
+            </div>
+            <div style="text-align: left; margin-bottom: 1.5rem;">
+                <label style="display: block; font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Password</label>
+                <input type="password" id="loginPassword" class="form-control" placeholder="Enter password" style="width: 100%;" onkeypress="if(event.key === 'Enter') checkLogin()">
+            </div>
+            <div id="loginError" style="color: var(--danger); font-size: 0.875rem; margin-bottom: 1rem; display: none;">Invalid username or password.</div>
+            <button class="btn btn-primary" style="width: 100%; padding: 0.75rem; font-size: 1rem;" onclick="checkLogin()">Login</button>
+        </div>
+    </div>
+    
+    <script>
+        function checkLogin() {
+            const user = document.getElementById('loginUsername').value;
+            const pass = document.getElementById('loginPassword').value;
+            if (user === 'admin' && pass === '2024') {
+                const overlay = document.getElementById('loginOverlay');
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 300);
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+            }
+        }
+    </script>
+
+    <header>
+        <div class="container header-content">
+            <div class="logo-section">
+                <div class="logo-box">
+                    <img src="data:image/jpeg;base64,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"
+                        alt="Logo" />
+                </div>
+                <div>
+                    <h1 class="app-title hide-mobile">Compilation Manager</h1>
+                </div>
+                <span class="badge">Cloud Live</span>
+            </div>
+
+            <div class="header-actions">
+                <select id="headerBatchFilter">
+                    <option value="all">All Batches</option>
+                </select>
+                <button onclick="openBatchModal()" class="btn btn-primary"><i data-lucide="layers"
+                        style="width:16px;height:16px;"></i> Manage Batches</button>
+                <button id="themeToggle" class="icon-btn" title="Toggle Theme">
+                    <i data-lucide="moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="search-wrapper">
+                <i data-lucide="search" class="search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Search by name, roll no...">
+            </div>
+
+            <div class="flex items-center gap-2">
+                <div class="dropdown">
+                    <button id="exportDropdownBtn" class="btn btn-ghost">
+                        <i data-lucide="download" style="width:16px; height:16px;"></i> Export
+                    </button>
+                    <div id="exportMenu" class="dropdown-menu">
+                        <button class="dropdown-item" onclick="exportJSON()">
+                            <i data-lucide="file-json" style="color:#8B5CF6; width:16px; height:16px;"></i>
+                            JSON (Full Backup)
+                        </button>
+                        <button class="dropdown-item" onclick="exportPDF(false)">
+                            <i data-lucide="file-text" style="color:var(--primary); width:16px; height:16px;"></i> PDF
+                            (Full)
+                        </button>
+                        <button class="dropdown-item" onclick="exportPDF(true)">
+                            <i data-lucide="file-check" style="color:green; width:16px; height:16px;"></i> PDF (Safe
+                            Mode)
+                        </button>
+                    </div>
+                </div>
+
+                <button id="importBtn" class="btn btn-primary" onclick="openImportModal()">
+                    <i data-lucide="upload" style="width:16px; height:16px;"></i> Import JSON
+                </button>
+
+                <button id="syncBtn" class="btn btn-primary" title="Force Sync">
+                    <i data-lucide="refresh-cw" style="width:16px; height:16px;"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div>
+                    <div class="stat-label">Total Entries</div>
+                    <div class="stat-value" id="totalCount">0</div>
+                </div>
+                <div class="stat-icon"><i data-lucide="users"></i></div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:60px; text-align:center;">#</th>
+                        <th class="sortable" onclick="sort('rollNumber')" style="width:100px;">Roll No <i
+                                data-lucide="arrow-up-down" class="icon-sort"></i></th>
+                        <th class="sortable" onclick="sort('studentName')">Student Name <i data-lucide="arrow-up-down"
+                                class="icon-sort"></i></th>
+                        <th>Submission Link</th>
+                        <th style="text-align:center;">Checked</th>
+                        <th class="sortable" onclick="sort('createdAt')">Submitted At <i data-lucide="arrow-up-down"
+                                class="icon-sort"></i></th>
+                        <th style="width:160px; text-align:center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+
+            <div id="emptyState" class="empty-state">
+                <p>Waiting for student submissions...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Hidden file input for import -->
+    <input type="file" id="importFileInput" hidden accept="application/json" />
+
+    <!-- Modals -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Entry</h2>
+                <button class="icon-btn" onclick="closeEditModal()"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editEntryId">
+                <div class="form-group">
+                    <label>Student Name</label>
+                    <input type="text" id="editStudentName" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Roll Number</label>
+                    <input type="text" id="editRollNumber" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Submission Link</label>
+                    <input type="url" id="editCanvaUrl" class="form-control">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveEditEntry()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="batchModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Manage Batches</h2>
+                <button class="icon-btn" onclick="closeBatchModal()"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="flex gap-2" style="margin-bottom: 1rem;">
+                    <input type="text" id="newBatchName" class="form-control"
+                        placeholder="New Batch Name (e.g., 2025-26)">
+                    <button class="btn btn-primary" onclick="createNewBatch()">Add</button>
+                </div>
+                <div class="table-container" style="max-height: 300px; overflow-y: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Batch Name</th>
+                                <th style="width:140px; text-align:center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="batchTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Import JSON Data</h2>
+                <button class="icon-btn" onclick="closeImportModal()"><i data-lucide="x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="importModeSelection">
+                    <div class="form-group">
+                        <label>Select Import Mode:</label>
+                    </div>
+
+                    <div class="import-mode-card mode-safe selected" onclick="selectImportMode('merge')">
+                        <h3>
+                            <i data-lucide="merge" style="color:var(--success);"></i>
+                            Merge (Safe)
+                        </h3>
+                        <p>Add new documents and update existing ones by ID. Keeps other data untouched.</p>
+                    </div>
+
+                    <div class="import-mode-card mode-update" onclick="selectImportMode('update')">
+                        <h3>
+                            <i data-lucide="refresh-cw" style="color:var(--warning);"></i>
+                            Update Existing Only
+                        </h3>
+                        <p>Only update documents that already exist. Skips new documents.</p>
+                    </div>
+
+                    <div class="import-mode-card mode-danger" onclick="selectImportMode('replace')">
+                        <h3>
+                            <i data-lucide="trash-2" style="color:var(--danger);"></i>
+                            Full Reset (Dangerous)
+                        </h3>
+                        <p>Delete ALL existing data, then restore from JSON. Irreversible!</p>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 1.5rem;">
+                        <button class="btn btn-primary" style="width: 100%;" onclick="triggerFileSelect()">
+                            <i data-lucide="file-json" style="width:16px; height:16px;"></i>
+                            Select JSON File
+                        </button>
+                    </div>
+                </div>
+
+                <div id="importProgress" style="display: none;">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">Preparing import...</div>
+                    </div>
+                </div>
+
+                <div id="importSuccess" style="display: none; text-align: center; padding: 2rem 0;">
+                    <i data-lucide="check-circle" style="width:64px; height:64px; color:var(--success);"></i>
+                    <h3 style="margin-top: 1rem; font-size: 1.25rem; font-weight: 600;">Import Complete!</h3>
+                    <p id="importSummary" style="color:var(--text-secondary); margin-top: 0.5rem;"></p>
+                </div>
+            </div>
+            <div class="modal-footer" id="importModalFooter">
+                <button class="btn btn-ghost" onclick="closeImportModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Startup Batch Selection Modal -->
+    <div id="startupBatchModal" class="modal active"
+        style="z-index: 9999; backdrop-filter: blur(10px); background: rgba(0,0,0,0.5);">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div class="modal-header" style="justify-content: center; padding-bottom: 0.5rem;">
+                <h2>Welcome</h2>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">Please select a batch to start managing
+                    submissions.</p>
+                <div class="form-group" style="text-align: left;">
+                    <select id="startupBatchSelect" class="form-control"
+                        style="padding: 0.75rem; font-size: 1rem; border-radius: 0.5rem;">
+                        <option value="none" disabled selected>Loading batches...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer" style="justify-content: center; padding-top: 0.5rem;">
+                <button class="btn btn-primary" onclick="confirmStartupBatch()"
+                    style="width: 100%; padding: 0.8rem; font-size: 1rem;">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, initializeFirestore, collection, onSnapshot, doc, deleteDoc, updateDoc, addDoc, getDocs, setDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDFieReeeriSxqd3w3AAiE8Qppd2om7wgo",
+            authDomain: "compilation-bf23f.firebaseapp.com",
+            projectId: "compilation-bf23f",
+            storageBucket: "compilation-bf23f.firebasestorage.app",
+            messagingSenderId: "163111971571",
+            appId: "1:163111971571:web:ac9989c2d634ad55396586",
+            measurementId: "G-YXFGZT7CHH"
+        };
+
+        let app, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            // Only force long-polling if opened locally via file:/// to bypass strict Chrome CORS.
+            // When hosted on a real domain (https://), use standard WebSockets which won't trigger the wildcard CORS error.
+            if (window.location.protocol === 'file:') {
+                db = initializeFirestore(app, {
+                    experimentalForceLongPolling: true
+                });
+            } else {
+                db = getFirestore(app);
+            }
+        } catch (e) { console.error(e); }
+
+        let currentBatchId = 'all';
+        let allEntries = [];
+        let filteredEntries = [];
+        let batchesList = [];
+        let sortCol = 'rollNumber';
+        let sortAsc = true;
+        let unsubscribeEntries = null;
+        let selectedImportMode = 'merge';
+
+        initDashboard();
+
+        function initDashboard() {
+            const q = query(collection(db, "submissions"), orderBy("createdAt", "desc"));
+            unsubscribeEntries = onSnapshot(q, (snapshot) => {
+                allEntries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                applyFilters();
+            });
+
+            onSnapshot(collection(db, "batches"), (snap) => {
+                const select = document.getElementById('headerBatchFilter');
+                const startupSelect = document.getElementById('startupBatchSelect');
+                const currentVal = select.value;
+                const currentStartupVal = startupSelect ? startupSelect.value : 'none';
+
+                select.innerHTML = '<option value="all">All Batches</option>';
+                if (startupSelect) {
+                    startupSelect.innerHTML = '<option value="none" disabled selected>Select a batch...</option><option value="all">View All Batches</option>';
+                }
+
+                batchesList = [];
+                snap.forEach(doc => {
+                    const b = doc.data();
+                    batchesList.push({ id: doc.id, name: b.name });
+
+                    const opt = document.createElement('option');
+                    opt.value = doc.id;
+                    opt.text = b.name;
+                    select.add(opt);
+
+                    if (startupSelect) {
+                        const opt2 = document.createElement('option');
+                        opt2.value = doc.id;
+                        opt2.text = b.name;
+                        startupSelect.add(opt2);
+                    }
+                });
+
+                select.value = currentVal || 'all';
+                if (startupSelect && currentStartupVal && currentStartupVal !== 'none') {
+                    // Retain selection if they had already opened the dropdown
+                    startupSelect.value = currentStartupVal;
+                }
+
+                if (document.getElementById('batchModal').classList.contains('active')) {
+                    renderBatchTable();
+                }
+            });
+        }
+
+        window.confirmStartupBatch = function () {
+            const startupSelect = document.getElementById('startupBatchSelect');
+            if (!startupSelect || startupSelect.value === 'none') {
+                alert("Please select a batch to continue.");
+                return;
+            }
+
+            const selectedValue = startupSelect.value;
+            currentBatchId = selectedValue;
+            document.getElementById('headerBatchFilter').value = selectedValue;
+
+            document.getElementById('startupBatchModal').classList.remove('active');
+            applyFilters();
+        };
+
+        document.getElementById('headerBatchFilter').addEventListener('change', (e) => {
+            currentBatchId = e.target.value;
+            applyFilters();
+        });
+
+        document.getElementById('searchInput').addEventListener('input', () => applyFilters());
+
+        document.getElementById('syncBtn').addEventListener('click', () => {
+            applyFilters();
+        });
+
+        function applyFilters() {
+            let temp = [...allEntries];
+
+            // Batch filter
+            if (currentBatchId !== 'all') {
+                temp = temp.filter(entry => entry.batchId === currentBatchId);
+            }
+
+            // Search filter
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (searchVal) {
+                temp = temp.filter(entry =>
+                    entry.studentName?.toLowerCase().includes(searchVal) ||
+                    entry.rollNumber?.toString().includes(searchVal)
+                );
+            }
+
+            // Sorting
+            temp.sort((a, b) => {
+                let valA = a[sortCol] || '';
+                let valB = b[sortCol] || '';
+
+                if (sortCol === 'rollNumber') {
+                    valA = parseInt(valA) || 0;
+                    valB = parseInt(valB) || 0;
+                }
+
+                if (valA < valB) return sortAsc ? -1 : 1;
+                if (valA > valB) return sortAsc ? 1 : -1;
+                return 0;
+            });
+
+            filteredEntries = temp;
+            renderTable();
+            updateStats();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+
+            if (filteredEntries.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.add('active');
+                return;
+            }
+
+            emptyState.classList.remove('active');
+            tbody.innerHTML = filteredEntries.map((entry, idx) => `
+                <tr>
+                    <td style="text-align:center;">${idx + 1}</td>
+                    <td><strong>${entry.rollNumber || '-'}</strong></td>
+                    <td>${entry.studentName || '-'}</td>
+                    <td>
+                        <a href="${entry.canvaUrl || '#'}" target="_blank" rel="noopener noreferrer"
+                            style="color:var(--primary); text-decoration:none;">
+                            ${entry.canvaUrl ? 'View Submission' : '-'}
+                        </a>
+                    </td>
+                    <td style="text-align:center; cursor:pointer;" onclick="toggleCheck('${entry.id}')" title="Toggle Checked">
+                        ${entry.checked ?
+                    '<i data-lucide="check-circle" style="color:green; width:20px; height:20px; display:inline-block;"></i>' :
+                    '<i data-lucide="circle" style="color:var(--text-secondary); width:20px; height:20px; display:inline-block;"></i>'}
+                    </td>
+                    <td>${entry.createdAt ? new Date(entry.createdAt).toLocaleString() : '-'}</td>
+                    <td>
+                        <div style="display:flex; justify-content:center; gap:0.5rem;">
+                            <button class="icon-btn" onclick="editEntry('${entry.id}')" title="Edit">
+                                <i data-lucide="edit-2" style="width:16px; height:16px;"></i>
+                            </button>
+                            <button class="icon-btn" onclick="deleteEntry('${entry.id}')" title="Delete" style="color:var(--danger);">
+                                <i data-lucide="trash-2" style="width:16px; height:16px;"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function updateStats() {
+            document.getElementById('totalCount').textContent = filteredEntries.length;
+        }
+
+        function sort(col) {
+            if (sortCol === col) {
+                sortAsc = !sortAsc;
+            } else {
+                sortCol = col;
+                sortAsc = true;
+            }
+            applyFilters();
+        }
+
+        // Edit functionality
+        window.editEntry = function (id) {
+            const entry = allEntries.find(e => e.id === id);
+            if (!entry) return;
+
+            document.getElementById('editEntryId').value = id;
+            document.getElementById('editStudentName').value = entry.studentName || '';
+            document.getElementById('editRollNumber').value = entry.rollNumber || '';
+            document.getElementById('editCanvaUrl').value = entry.canvaUrl || '';
+
+            document.getElementById('editModal').classList.add('active');
+        };
+
+        window.closeEditModal = function () {
+            document.getElementById('editModal').classList.remove('active');
+        };
+
+        window.saveEditEntry = async function () {
+            const id = document.getElementById('editEntryId').value;
+            if (!id) return;
+
+            const updateData = {
+                studentName: document.getElementById('editStudentName').value,
+                rollNumber: document.getElementById('editRollNumber').value,
+                canvaUrl: document.getElementById('editCanvaUrl').value
+            };
+
+            try {
+                await updateDoc(doc(db, "submissions", id), updateData);
+                closeEditModal();
+            } catch (err) {
+                console.error("Update error:", err);
+                alert("Failed to update entry");
+            }
+        };
+
+        // Delete functionality
+        window.deleteEntry = async function (id) {
+            if (!confirm("Are you sure you want to delete this entry?")) return;
+
+            try {
+                await deleteDoc(doc(db, "submissions", id));
+            } catch (err) {
+                console.error("Delete error:", err);
+                alert("Failed to delete entry");
+            }
+        };
+
+        // Toggle checked
+        window.toggleCheck = async function (id) {
+            const entry = allEntries.find(e => e.id === id);
+            if (!entry) return;
+
+            try {
+                await updateDoc(doc(db, "submissions", id), {
+                    checked: !entry.checked
+                });
+            } catch (err) {
+                console.error("Toggle error:", err);
+            }
+        };
+
+        // Batch management
+        window.openBatchModal = function () {
+            document.getElementById('batchModal').classList.add('active');
+            renderBatchTable();
+        };
+
+        window.closeBatchModal = function () {
+            document.getElementById('batchModal').classList.remove('active');
+        };
+
+        function renderBatchTable() {
+            const tbody = document.getElementById('batchTableBody');
+            tbody.innerHTML = batchesList.map(batch => `
+                <tr>
+                    <td>${batch.name}</td>
+                    <td style="text-align:center;">
+                        <button class="icon-btn" onclick="deleteBatch('${batch.id}')" title="Delete Batch" style="color:var(--danger);">
+                            <i data-lucide="trash-2" style="width:16px; height:16px;"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        window.createNewBatch = async function () {
+            const name = document.getElementById('newBatchName').value.trim();
+            if (!name) return alert("Please enter a batch name");
+
+            try {
+                await addDoc(collection(db, "batches"), { name });
+                document.getElementById('newBatchName').value = '';
+            } catch (err) {
+                console.error("Create batch error:", err);
+                alert("Failed to create batch");
+            }
+        };
+
+        window.deleteBatch = async function (id) {
+            if (!confirm("Are you sure? This will not delete student submissions.")) return;
+
+            try {
+                await deleteDoc(doc(db, "batches", id));
+            } catch (err) {
+                console.error("Delete batch error:", err);
+                alert("Failed to delete batch");
+            }
+        };
+
+        // Export JSON functionality
+        window.exportJSON = async function () {
+            try {
+                // Fetch all collections
+                const batchSnap = await getDocs(collection(db, "batches"));
+                const submissionSnap = await getDocs(collection(db, "submissions"));
+
+                // Convert to plain JSON with IDs
+                const batches = batchSnap.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                const submissions = submissionSnap.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                // Create export object with versioning
+                const exportData = {
+                    exportedAt: new Date().toISOString(),
+                    version: 1,
+                    schema: "kriya-compilation-v1",
+                    batches,
+                    submissions
+                };
+
+                // Download file
+                const blob = new Blob(
+                    [JSON.stringify(exportData, null, 2)],
+                    { type: "application/json" }
+                );
+
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `kriya_compilation_backup_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                // Close dropdown
+                document.getElementById('exportMenu').classList.remove('active');
+
+            } catch (err) {
+                console.error("Export error:", err);
+                alert("Failed to export JSON: " + err.message);
+            }
+        };
+
+        // Export PDF functionality
+        window.exportPDF = function (safeMode) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFontSize(18);
+            doc.text("Compilation Submissions Report", 14, 22);
+
+            doc.setFontSize(10);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
+
+            const tableData = filteredEntries.map((entry, idx) => [
+                idx + 1,
+                entry.rollNumber || '-',
+                entry.studentName || '-',
+                safeMode ? 'Hidden' : (entry.canvaUrl || '-'),
+                entry.checked ? 'Yes' : 'No',
+                entry.createdAt ? new Date(entry.createdAt).toLocaleDateString() : '-'
+            ]);
+
+            doc.autoTable({
+                head: [['#', 'Roll No', 'Student Name', 'Submission Link', 'Checked', 'Submitted At']],
+                body: tableData,
+                startY: 35,
+                theme: 'grid',
+                styles: { fontSize: 8 },
+                headStyles: { fillColor: [37, 99, 235] }
+            });
+
+            doc.save(`compilation-report-${new Date().toISOString().split('T')[0]}.pdf`);
+        };
+
+        // Import JSON functionality
+        window.openImportModal = function () {
+            document.getElementById('importModal').classList.add('active');
+            resetImportModal();
+        };
+
+        window.closeImportModal = function () {
+            document.getElementById('importModal').classList.remove('active');
+        };
+
+        function resetImportModal() {
+            selectedImportMode = 'merge';
+            document.querySelectorAll('.import-mode-card').forEach(card => card.classList.remove('selected'));
+            document.querySelector('.import-mode-card.mode-safe').classList.add('selected');
+            document.getElementById('importModeSelection').style.display = 'block';
+            document.getElementById('importProgress').style.display = 'none';
+            document.getElementById('importSuccess').style.display = 'none';
+            document.getElementById('importModalFooter').style.display = 'flex';
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressText').textContent = 'Preparing import...';
+        }
+
+        window.selectImportMode = function (mode) {
+            selectedImportMode = mode;
+            document.querySelectorAll('.import-mode-card').forEach(card => card.classList.remove('selected'));
+            document.querySelector(`.import-mode-card.mode-${mode}`).classList.add('selected');
+        };
+
+        window.triggerFileSelect = function () {
+            document.getElementById('importFileInput').click();
+        };
+
+        // File input change handler
+        document.getElementById('importFileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
+                const text = await file.text();
+                const data = JSON.parse(text);
+
+                // Validate JSON structure
+                if (!data.batches || !data.submissions) {
+                    throw new Error("Invalid JSON format: Missing 'batches' or 'submissions' arrays");
+                }
+
+                if (data.version !== 1) {
+                    if (!confirm(`Warning: Export version ${data.version} may not be compatible. Continue?`)) {
+                        resetImportModal();
+                        return;
+                    }
+                }
+
+                // Start import
+                await importJSONData(data);
+
+            } catch (err) {
+                console.error("Import error:", err);
+                alert("Import failed: " + err.message);
+                resetImportModal();
+            } finally {
+                // Reset file input
+                e.target.value = '';
+            }
+        });
+
+        async function importJSONData(data) {
+            const batches = data.batches || [];
+            const submissions = data.submissions || [];
+            const totalItems = batches.length + submissions.length;
+
+            // Show progress
+            document.getElementById('importModeSelection').style.display = 'none';
+            document.getElementById('importProgress').style.display = 'block';
+            document.getElementById('importModalFooter').style.display = 'none';
+
+            let processedCount = 0;
+            let batchesImported = 0;
+            let batchesUpdated = 0;
+            let submissionsImported = 0;
+            let submissionsUpdated = 0;
+
+            const updateProgress = (count, message) => {
+                processedCount = count;
+                const percentage = Math.round((processedCount / totalItems) * 100);
+                document.getElementById('progressFill').style.width = percentage + '%';
+                document.getElementById('progressText').textContent = message;
+            };
+
+            try {
+                // Pre-fetch all existing IDs to avoid O(N) reads inside loop
+                updateProgress(0, 'Analyzing existing data...');
+                const existingBatchesSnap = await getDocs(collection(db, "batches"));
+                const existingBatchIds = new Set(existingBatchesSnap.docs.map(d => d.id));
+
+                const existingSubmissionsSnap = await getDocs(collection(db, "submissions"));
+                const existingSubmissionIds = new Set(existingSubmissionsSnap.docs.map(d => d.id));
+
+                // Handle Replace Mode - Delete all existing data first
+                if (selectedImportMode === 'replace') {
+                    updateProgress(0, 'Deleting existing data...');
+
+                    // Delete all existing submissions
+                    for (const docSnap of existingSubmissionsSnap.docs) {
+                        await deleteDoc(doc(db, "submissions", docSnap.id));
+                    }
+
+                    // Delete all existing batches
+                    for (const docSnap of existingBatchesSnap.docs) {
+                        await deleteDoc(doc(db, "batches", docSnap.id));
+                    }
+
+                    // Clear Sets since we just wiped database
+                    existingBatchIds.clear();
+                    existingSubmissionIds.clear();
+
+                    updateProgress(0, 'Importing data...');
+                }
+
+                // Import batches first (required for submissions to reference them)
+                for (let i = 0; i < batches.length; i++) {
+                    const batch = batches[i];
+                    const { id, ...batchData } = batch;
+
+                    updateProgress(i, `Importing batches (${i + 1}/${batches.length})...`);
+
+                    const exists = existingBatchIds.has(id);
+
+                    if (selectedImportMode === 'replace') {
+                        // Always create new
+                        await setDoc(doc(db, "batches", id), batchData);
+                        batchesImported++;
+                    } else if (selectedImportMode === 'update') {
+                        // Only update existing
+                        if (exists) {
+                            await setDoc(doc(db, "batches", id), batchData, { merge: true });
+                            batchesUpdated++;
+                        }
+                    } else {
+                        // Merge mode - create or update
+                        await setDoc(doc(db, "batches", id), batchData, { merge: true });
+                        if (exists) {
+                            batchesUpdated++;
+                        } else {
+                            existingBatchIds.add(id); // track for later iterations if dupes exist in json
+                            batchesImported++;
+                        }
+                    }
+                }
+
+                // Import submissions
+                for (let i = 0; i < submissions.length; i++) {
+                    const submission = submissions[i];
+                    const { id, ...submissionData } = submission;
+
+                    updateProgress(batches.length + i, `Importing submissions (${i + 1}/${submissions.length})...`);
+
+                    // Handle optional fields
+                    if (submissionData.checked === undefined) {
+                        submissionData.checked = false;
+                    }
+
+                    const exists = existingSubmissionIds.has(id);
+
+                    if (selectedImportMode === 'replace') {
+                        // Always create new
+                        await setDoc(doc(db, "submissions", id), submissionData);
+                        submissionsImported++;
+                    } else if (selectedImportMode === 'update') {
+                        // Only update existing
+                        if (exists) {
+                            await setDoc(doc(db, "submissions", id), submissionData, { merge: true });
+                            submissionsUpdated++;
+                        }
+                    } else {
+                        // Merge mode - create or update
+                        await setDoc(doc(db, "submissions", id), submissionData, { merge: true });
+                        if (exists) {
+                            submissionsUpdated++;
+                        } else {
+                            existingSubmissionIds.add(id); // track for later iterations if dupes exist in json
+                            submissionsImported++;
+                        }
+                    }
+                }
+
+                // Show success
+                document.getElementById('importProgress').style.display = 'none';
+                document.getElementById('importSuccess').style.display = 'block';
+                document.getElementById('importSummary').innerHTML = `
+                    <strong>Batches:</strong> ${batchesImported} added, ${batchesUpdated} updated<br>
+                    <strong>Submissions:</strong> ${submissionsImported} added, ${submissionsUpdated} updated
+                `;
+
+                lucide.createIcons();
+
+            } catch (err) {
+                console.error("Import error:", err);
+                alert("Import failed: " + err.message);
+                closeImportModal();
+            }
+        }
+
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+        });
+
+        // Dropdown toggle
+        document.getElementById('exportDropdownBtn').addEventListener('click', () => {
+            document.getElementById('exportMenu').classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown')) {
+                document.getElementById('exportMenu').classList.remove('active');
+            }
+        });
+
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
